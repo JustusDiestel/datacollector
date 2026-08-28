@@ -1,9 +1,8 @@
 package tech.justus.diestel.datacollector.dataset;
 
 import jakarta.persistence.*;
-
-
 import java.time.Instant;
+
 
 @Entity
 public class Dataset {
