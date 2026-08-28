@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dataset</title>
+</head>
+
+<body>
+
+<a href="/">Zurück</a>
+
+<h1 th:text="${dataset.name}">
+    Dataset Name
+</h1>
+
+<p th:text="${dataset.description}">
+    Beschreibung
+</p>
+
+<p>
+    Status:
+    <span th:text="${dataset.status}">RUNNING</span>
+</p>
+
+<p>
+    Erstellt:
+    <span th:text="${dataset.createdAt}"></span>
+</p>
+
+<p>
+    Records:
+    <span th:text="${dataset.recordCount}">0</span>
+</p>
+
+</body>
+</html>

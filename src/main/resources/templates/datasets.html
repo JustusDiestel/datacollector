@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Datasets</title>
+</head>
+
+<body>
+
+<h1>Datasets</h1>
+
+<div th:if="${datasets.isEmpty()}">
+    Noch keine Datasets vorhanden.
+</div>
+
+<div th:each="dataset : ${datasets}">
+    <a th:href="@{/datasets/{id}(id=${dataset.id})}"
+       th:text="${dataset.name}">
+        Dataset Name
+    </a>
+    <p th:text="${dataset.description}">
+        Beschreibung
+    </p>
+
+    <p>
+        Status:
+        <span th:text="${dataset.status}">RUNNING</span>
+    </p>
+
+    <p>
+        Records:
+        <span th:text="${dataset.recordCount}">0</span>
+    </p>
+
+    <hr>
+</div>
+
+</body>
+</html>

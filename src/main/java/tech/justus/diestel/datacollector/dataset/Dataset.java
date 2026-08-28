@@ -54,4 +54,8 @@ public class Dataset {
     public void incrementRecordCount(){
         recordCount++;
     }
+
+    public Long getId() {
+        return id;
+    }
 }

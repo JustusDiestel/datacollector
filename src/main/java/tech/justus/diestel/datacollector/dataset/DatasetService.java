@@ -18,4 +18,8 @@ public class DatasetService {
     public List<Dataset> getAllDatasets(){
         return datasetRepository.findAll();
     }
+
+    public Dataset getDatasetById(Long id){
+        return datasetRepository.findById(id).orElseThrow(() -> new RuntimeException("Dataset not found"));
+    }
 }
