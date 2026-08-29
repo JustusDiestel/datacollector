@@ -1,5 +1,5 @@
 package tech.justus.diestel.datacollector.collector;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,6 +11,7 @@ public class FieldMapping {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collector_id", nullable = false)
+    @JsonIgnore
     private Collector collector;
 
     private String sourcePath;

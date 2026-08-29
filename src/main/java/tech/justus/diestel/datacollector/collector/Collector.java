@@ -29,6 +29,21 @@ public class Collector {
 
     private Instant createdAt;
 
+    private Instant lastRunAt;
+
+    private boolean active = true;
+
+    @Column(length = 2000)
+    private String lastError;
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
     protected Collector() {
     }
 
@@ -75,5 +90,32 @@ public class Collector {
 
     public void addFieldMapping(FieldMapping fieldMapping) {
         fieldMappings.add(fieldMapping);
+    }
+
+    public Instant getLastRunAt() {
+        return lastRunAt;
+    }
+
+    public void setLastRunAt(Instant lastRunAt) {
+        this.lastRunAt = lastRunAt;
+    }
+
+    public String getLastError() {
+        return lastError;
+    }
+
+    public void setLastError(String lastError) {
+        this.lastError = lastError;
+    }
+
+    @Transient
+    public String getStatus() {
+        if (!active) {
+            return "PAUSED";
+        }
+        if (lastError != null) {
+            return "ERROR";
+        }
+        return "ACTIVE";
     }
 }
