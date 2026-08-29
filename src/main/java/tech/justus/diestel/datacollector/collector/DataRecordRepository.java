@@ -7,4 +7,6 @@ import java.util.List;
 public interface DataRecordRepository extends JpaRepository<DataRecord, Long> {
 
     List<DataRecord> findByCollectorIdOrderByCollectedAtDesc(Long collectorId);
+
+    void deleteByCollectorId(Long collectorId);
 }

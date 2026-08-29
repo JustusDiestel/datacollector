@@ -59,15 +59,17 @@ public class HttpJsonCollector {
 
         for (FieldMapping mapping : collector.getFieldMappings()) {
 
-            JsonNode value = findPath(
-                    record,
-                    mapping.getSourcePath()
-            );
+            JsonNode value = findPath(record, mapping.getSourcePath());
 
-            result.put(
-                    mapping.getTargetName(),
-                    value
-            );
+            Object convertedValue = switch (mapping.getDataType()) {
+                case "DOUBLE" -> value.asDouble();
+                case "INTEGER" -> value.asInt();
+                case "BOOLEAN" -> value.asBoolean();
+                case "STRING" -> value.asText();
+                default -> value.asText();
+            };
+
+            result.put(mapping.getTargetName(), convertedValue);
         }
 
         return result;

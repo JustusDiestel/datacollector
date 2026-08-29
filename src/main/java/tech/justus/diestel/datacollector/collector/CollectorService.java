@@ -64,7 +64,9 @@ public class CollectorService {
     @Transactional
     public List<DataRecord> collectOnce(Long collectorId) throws Exception {
 
-        Collector collector = getCollectorById(collectorId);
+        Collector collector = collectorRepository
+                .findByIdWithFieldMappings(collectorId)
+                .orElseThrow(() -> new RuntimeException("Collector not found"));
 
         try {
             List<Map<String, Object>> collectedData =
@@ -138,4 +140,23 @@ public class CollectorService {
 
         return collectorRepository.save(collector);
     }
+
+    @Transactional
+    public void deleteCollector(Long id) {
+
+        Collector collector = getCollectorById(id);
+
+        dataRecordRepository.deleteByCollectorId(id);
+
+        collectorRepository.delete(collector);
+    }
+
+    @Transactional
+    public void deleteRecords(Long collectorId) {
+        getCollectorById(collectorId);
+        dataRecordRepository.deleteByCollectorId(collectorId);
+    }
+
+
+
 }

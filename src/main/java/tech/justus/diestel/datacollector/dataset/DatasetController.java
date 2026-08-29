@@ -1,13 +1,14 @@
 package tech.justus.diestel.datacollector.dataset;
 
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
-@RequestMapping("/datasets")
+@RequestMapping("/api/datasets")
 public class DatasetController {
-    private final DatasetService datasetService;
 
+    private final DatasetService datasetService;
 
     public DatasetController(DatasetService datasetService) {
         this.datasetService = datasetService;
@@ -18,11 +19,13 @@ public class DatasetController {
         return datasetService.getAllDatasets();
     }
 
-    @PostMapping
-    public Dataset createDataset(@RequestBody CreateDatasetRequest request){
-        return datasetService.createDataset(
-            request.name(),
-            request.description()
-        );
+    @GetMapping("/{id}")
+    public Dataset getDataset(@PathVariable Long id) {
+        return datasetService.getDatasetById(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteDataset(@PathVariable Long id) {
+        datasetService.deleteDataset(id);
     }
 }

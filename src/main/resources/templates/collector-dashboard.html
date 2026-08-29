@@ -1,96 +1,91 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Collectors</title>
+    <form th:action="@{/logout}" method="post">
+        <button type="submit">Logout</button>
+    </form>
+    <style>
+        :root { font-family: Arial, sans-serif; color: #1f2937; background: #f6f7f9; }
+        * { box-sizing: border-box; }
+        body { margin: 0; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 32px 20px; }
+        nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+        nav a, .button { text-decoration: none; color: inherit; }
+        .nav-links { display: flex; gap: 16px; }
+        h1 { margin: 0 0 8px; }
+        .muted { color: #6b7280; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 24px 0; }
+        .button { display: inline-block; border: 1px solid #d1d5db; background: white; padding: 10px 14px; border-radius: 8px; cursor: pointer; }
+        .button.primary { background: #111827; color: white; border-color: #111827; }
+        .grid { display: grid; gap: 16px; }
+        .card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+        .card h2 { margin: 0 0 8px; font-size: 20px; }
+        .card h2 a { color: #111827; text-decoration: none; }
+        .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 18px; }
+        .meta-item { background: #f9fafb; border-radius: 8px; padding: 12px; }
+        .meta-label { display: block; font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+        .status { display: inline-block; border-radius: 999px; padding: 4px 9px; font-size: 12px; background: #eef2ff; }
+        .empty { background: white; border: 1px dashed #d1d5db; border-radius: 12px; padding: 28px; text-align: center; color: #6b7280; }
+        .error { color: #b91c1c; overflow-wrap: anywhere; }
+    </style>
 </head>
-
 <body>
+<div class="container">
+    <nav>
+        <strong>Data Collector</strong>
+        <div class="nav-links">
+            <a href="/datasets">Datasets</a>
+            <a href="/collector-dashboard">Collectors</a>
+        </div>
+    </nav>
 
-<h1>Collectors</h1>
+    <div class="toolbar">
+        <div>
+            <h1>Collectors</h1>
+            <div class="muted">Konfiguriere und überwache deine Datenquellen.</div>
+        </div>
+        <a class="button primary" href="/collector-dashboard/new">Create Collector</a>
+    </div>
 
-<div th:each="collector : ${collectors}">
+    <div class="empty" th:if="${#lists.isEmpty(collectors)}">
+        Noch keine Collectors vorhanden.
+    </div>
 
-    <h2 th:text="${collector.name}">
-        Collector
-    </h2>
+    <div class="grid" th:unless="${#lists.isEmpty(collectors)}">
+        <article class="card" th:each="collector : ${collectors}">
+            <div class="card-header">
+                <div>
+                    <h2>
+                        <a th:href="@{/collector-dashboard/{id}(id=${collector.id})}"
+                           th:text="${collector.name}">Collector</a>
+                    </h2>
+                    <div class="muted" th:text="${collector.url}">API URL</div>
+                </div>
+                <span class="status" th:text="${collector.status}">ACTIVE</span>
+            </div>
 
-    <p>
-        Status:
-        <span th:text="${collector.status}"></span>
-    </p>
-    <h3>Collected data</h3>
+            <div class="meta">
+                <div class="meta-item">
+                    <span class="meta-label">Interval</span>
+                    <span th:text="${collector.intervalSeconds}">0</span> seconds
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Last run</span>
+                    <span th:text="${collector.lastRunAt != null ? collector.lastRunAt : 'Noch nie'}">Noch nie</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Fields</span>
+                    <span th:text="${#lists.size(collector.fieldMappings)}">0</span>
+                </div>
+            </div>
 
-    <table border="1">
-        <thead>
-        <tr>
-            <th>Time</th>
-
-            <th th:each="field : ${collector.fieldMappings}"
-                th:text="${field.targetName}">
-            </th>
-        </tr>
-        </thead>
-
-        <tbody>
-        <tr th:each="record : ${recordsByCollector[collector.id]}">
-
-            <td th:text="${record.collectedAt}"></td>
-
-            <td th:each="field : ${collector.fieldMappings}"
-                th:text="${record.payload[field.targetName]}">
-            </td>
-
-        </tr>
-        </tbody>
-    </table>
-    <form
-            th:if="${collector.active}"
-            th:action="@{/collector-dashboard/{id}/stop(id=${collector.id})}"
-            method="post">
-
-        <button type="submit">
-            Stop
-        </button>
-    </form>
-
-    <form
-            th:unless="${collector.active}"
-            th:action="@{/collector-dashboard/{id}/start(id=${collector.id})}"
-            method="post">
-
-        <button type="submit">
-            Start
-        </button>
-    </form>
-
-    <form
-            th:action="@{/collector-dashboard/{id}/collect(id=${collector.id})}"
-            method="post">
-        <button type="submit">
-            Collect now
-        </button>
-    </form>
-
-    <p>
-        Interval:
-        <span th:text="${collector.intervalSeconds}"></span>
-        seconds
-    </p>
-
-    <p>
-        Last run:
-        <span th:text="${collector.lastRunAt}"></span>
-    </p>
-
-    <p>
-        Last error:
-        <span th:text="${collector.lastError}"></span>
-    </p>
-
-    <hr>
-
+            <p class="error" th:if="${collector.lastError != null}" th:text="${collector.lastError}"></p>
+        </article>
+    </div>
 </div>
-
 </body>
 </html>

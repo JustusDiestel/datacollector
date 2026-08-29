@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Collector</title>
+    <style>
+        :root { font-family: Arial, sans-serif; color: #1f2937; background: #f6f7f9; }
+        * { box-sizing: border-box; }
+        body { margin: 0; }
+        .container { max-width: 900px; margin: 0 auto; padding: 32px 20px; }
+        nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+        nav a { color: inherit; text-decoration: none; }
+        .nav-links { display: flex; gap: 16px; }
+        .back { display: inline-block; margin-bottom: 18px; color: #374151; text-decoration: none; }
+        .card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; }
+        h1 { margin-top: 0; }
+        .muted { color: #6b7280; margin-bottom: 24px; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+        .full { grid-column: 1 / -1; }
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        input, select { width: 100%; padding: 10px 11px; border: 1px solid #d1d5db; border-radius: 8px; font: inherit; background: white; }
+        .fields-header { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; }
+        .field { display: grid; grid-template-columns: 1.2fr 1.2fr .8fr .8fr auto; gap: 10px; margin-top: 10px; align-items: end; }
+        button, .button { font: inherit; border: 1px solid #d1d5db; background: white; padding: 10px 14px; border-radius: 8px; cursor: pointer; }
+        .primary { background: #111827; color: white; border-color: #111827; }
+        .danger { color: #b91c1c; }
+        .actions { display: flex; gap: 10px; margin-top: 24px; }
+        @media (max-width: 760px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .full { grid-column: auto; }
+            .field { grid-template-columns: 1fr; border: 1px solid #e5e7eb; padding: 12px; border-radius: 8px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav>
+        <strong>Data Collector</strong>
+        <div class="nav-links">
+            <a href="/datasets">Datasets</a>
+            <a href="/collector-dashboard">Collectors</a>
+        </div>
+    </nav>
+
+    <a class="back" href="/collector-dashboard">← Back to Collectors</a>
+
+    <div class="card">
+        <h1>Create Collector</h1>
+        <p class="muted">Lege eine HTTP-JSON-Datenquelle und die Felder fest, die gespeichert werden sollen.</p>
+
+        <form action="/collector-dashboard/new" method="post">
+            <div class="form-grid">
+                <div>
+                    <label for="name">Name</label>
+                    <input id="name" type="text" name="name" required placeholder="Wetter Konstanz">
+                </div>
+
+                <div>
+                    <label for="intervalSeconds">Interval (seconds)</label>
+                    <input id="intervalSeconds" type="number" name="intervalSeconds" min="1" required value="300">
+                </div>
+
+                <div class="full">
+                    <label for="url">API URL</label>
+                    <input id="url" type="url" name="url" required placeholder="https://api.example.com/data">
+                </div>
+
+                <div class="full">
+                    <label for="recordsPath">Records Path</label>
+                    <input id="recordsPath" type="text" name="recordsPath" required placeholder="current">
+                </div>
+            </div>
+
+            <div class="fields-header">
+                <div>
+                    <h2>Fields</h2>
+                    <div class="muted">JSON-Pfad → gespeicherter Feldname</div>
+                </div>
+                <button type="button" onclick="addField()">Add field</button>
+            </div>
+
+            <div id="fields">
+                <div class="field">
+                    <div>
+                        <label>Source Path</label>
+                        <input type="text" name="sourcePath" required placeholder="temperature_2m">
+                    </div>
+                    <div>
+                        <label>Target Name</label>
+                        <input type="text" name="targetName" required placeholder="temperature">
+                    </div>
+                    <div>
+                        <label>Data Type</label>
+                        <select name="dataType">
+                            <option value="DOUBLE">DOUBLE</option>
+                            <option value="INTEGER">INTEGER</option>
+                            <option value="BOOLEAN">BOOLEAN</option>
+                            <option value="STRING">STRING</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Unit</label>
+                        <input type="text" name="unit" placeholder="°C">
+                    </div>
+                    <button class="danger" type="button" onclick="removeField(this)">Remove</button>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="primary" type="submit">Create Collector</button>
+                <button type="button" onclick="window.location.href='/collector-dashboard'">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function addField() {
+        const fields = document.getElementById("fields");
+        const field = document.createElement("div");
+        field.className = "field";
+        field.innerHTML = `
+            <div>
+                <label>Source Path</label>
+                <input type="text" name="sourcePath" required placeholder="source.path">
+            </div>
+            <div>
+                <label>Target Name</label>
+                <input type="text" name="targetName" required placeholder="targetName">
+            </div>
+            <div>
+                <label>Data Type</label>
+                <select name="dataType">
+                    <option value="DOUBLE">DOUBLE</option>
+                    <option value="INTEGER">INTEGER</option>
+                    <option value="BOOLEAN">BOOLEAN</option>
+                    <option value="STRING">STRING</option>
+                </select>
+            </div>
+            <div>
+                <label>Unit</label>
+                <input type="text" name="unit" placeholder="Unit">
+            </div>
+            <button class="danger" type="button" onclick="removeField(this)">Remove</button>
+        `;
+        fields.appendChild(field);
+    }
+
+    function removeField(button) {
+        const fields = document.getElementById("fields");
+        if (fields.children.length > 1) {
+            button.closest(".field").remove();
+        }
+    }
+</script>
+</body>
+</html>

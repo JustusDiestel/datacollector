@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class DatasetPageController {
@@ -14,15 +15,24 @@ public class DatasetPageController {
         this.datasetService = datasetService;
     }
 
-    @GetMapping("/")
+    @GetMapping("/datasets")
     public String showDatasets(Model model) {
         model.addAttribute("datasets", datasetService.getAllDatasets());
         return "datasets";
     }
 
     @GetMapping("/datasets/{id}")
-    public String showDataset(@PathVariable Long id, Model model) {
+    public String showDataset(
+            @PathVariable Long id,
+            Model model
+    ) {
         model.addAttribute("dataset", datasetService.getDatasetById(id));
         return "dataset-detail";
+    }
+
+    @PostMapping("/datasets/{id}/delete")
+    public String deleteDataset(@PathVariable Long id) {
+        datasetService.deleteDataset(id);
+        return "redirect:/datasets";
     }
 }

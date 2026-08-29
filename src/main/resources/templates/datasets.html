@@ -1,41 +1,72 @@
 <!DOCTYPE html>
-<html lang="de"
-      xmlns:th="http://www.thymeleaf.org">
-
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Datasets</title>
+    <style>
+        :root { font-family: Arial, sans-serif; color: #1f2937; background: #f6f7f9; }
+        * { box-sizing: border-box; }
+        body { margin: 0; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 32px 20px; }
+        nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+        nav a { color: inherit; text-decoration: none; }
+        .nav-links { display: flex; gap: 16px; }
+        h1 { margin: 0 0 8px; }
+        .muted { color: #6b7280; }
+        .grid { display: grid; gap: 16px; margin-top: 24px; }
+        .card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; }
+        .card-header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+        .card h2 { margin: 0 0 8px; font-size: 20px; }
+        .card h2 a { color: #111827; text-decoration: none; }
+        .status { display: inline-block; border-radius: 999px; padding: 4px 9px; font-size: 12px; background: #eef2ff; }
+        .meta { margin-top: 16px; color: #6b7280; }
+        .empty { margin-top: 24px; background: white; border: 1px dashed #d1d5db; border-radius: 12px; padding: 28px; text-align: center; color: #6b7280; }
+    </style>
 </head>
-
 <body>
+<div class="container">
+    <nav>
+        <strong>Data Collector</strong>
+        <div class="nav-links">
+            <a href="/datasets">Datasets</a>
+            <a href="/collector-dashboard">Collectors</a>
+        </div>
+    </nav>
 
-<h1>Datasets</h1>
+    <h1>Datasets</h1>
+    <div class="muted">Gesammelte Datensätze und ihr aktueller Status.</div>
 
-<div th:if="${datasets.isEmpty()}">
-    Noch keine Datasets vorhanden.
+    <div class="empty" th:if="${#lists.isEmpty(datasets)}">
+        Noch keine Datasets vorhanden.
+    </div>
+
+    <div class="grid" th:unless="${#lists.isEmpty(datasets)}">
+        <article class="card" th:each="dataset : ${datasets}">
+            <div class="card-header">
+                <div>
+                    <h2>
+                        <a th:href="@{/datasets/{id}(id=${dataset.id})}"
+                           th:text="${dataset.name}">
+                            Dataset Name
+                        </a>
+                    </h2>
+                    <div class="muted" th:text="${dataset.description}">
+                        Beschreibung
+                    </div>
+                </div>
+
+                <span class="status" th:text="${dataset.status}">
+                    RUNNING
+                </span>
+            </div>
+
+            <div class="meta">
+                Records:
+                <strong th:text="${dataset.recordCount}">0</strong>
+            </div>
+        </article>
+    </div>
 </div>
-
-<div th:each="dataset : ${datasets}">
-    <a th:href="@{/datasets/{id}(id=${dataset.id})}"
-       th:text="${dataset.name}">
-        Dataset Name
-    </a>
-    <p th:text="${dataset.description}">
-        Beschreibung
-    </p>
-
-    <p>
-        Status:
-        <span th:text="${dataset.status}">RUNNING</span>
-    </p>
-
-    <p>
-        Records:
-        <span th:text="${dataset.recordCount}">0</span>
-    </p>
-
-    <hr>
-</div>
-
 </body>
 </html>
