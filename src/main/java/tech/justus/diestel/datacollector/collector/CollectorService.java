@@ -1,6 +1,7 @@
 package tech.justus.diestel.datacollector.collector;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -59,6 +60,8 @@ public class CollectorService {
         return collectorRepository.findById(id).orElseThrow(() -> new RuntimeException("Collector not found"));
     }
 
+
+    @Transactional
     public List<DataRecord> collectOnce(Long collectorId) throws Exception {
 
         Collector collector = getCollectorById(collectorId);

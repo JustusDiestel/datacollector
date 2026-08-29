@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Collectors</title>
+</head>
+
+<body>
+
+<h1>Collectors</h1>
+
+<div th:each="collector : ${collectors}">
+
+    <h2 th:text="${collector.name}">
+        Collector
+    </h2>
+
+    <p>
+        Status:
+        <span th:text="${collector.status}"></span>
+    </p>
+    <h3>Collected data</h3>
+
+    <table border="1">
+        <thead>
+        <tr>
+            <th>Time</th>
+
+            <th th:each="field : ${collector.fieldMappings}"
+                th:text="${field.targetName}">
+            </th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="record : ${recordsByCollector[collector.id]}">
+
+            <td th:text="${record.collectedAt}"></td>
+
+            <td th:each="field : ${collector.fieldMappings}"
+                th:text="${record.payload[field.targetName]}">
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+    <form
+            th:if="${collector.active}"
+            th:action="@{/collector-dashboard/{id}/stop(id=${collector.id})}"
+            method="post">
+
+        <button type="submit">
+            Stop
+        </button>
+    </form>
+
+    <form
+            th:unless="${collector.active}"
+            th:action="@{/collector-dashboard/{id}/start(id=${collector.id})}"
+            method="post">
+
+        <button type="submit">
+            Start
+        </button>
+    </form>
+
+    <form
+            th:action="@{/collector-dashboard/{id}/collect(id=${collector.id})}"
+            method="post">
+        <button type="submit">
+            Collect now
+        </button>
+    </form>
+
+    <p>
+        Interval:
+        <span th:text="${collector.intervalSeconds}"></span>
+        seconds
+    </p>
+
+    <p>
+        Last run:
+        <span th:text="${collector.lastRunAt}"></span>
+    </p>
+
+    <p>
+        Last error:
+        <span th:text="${collector.lastError}"></span>
+    </p>
+
+    <hr>
+
+</div>
+
+</body>
+</html>
