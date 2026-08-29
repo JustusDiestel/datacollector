@@ -1,14 +1,43 @@
 services:
+  app:
+    build: .
+    container_name: datacollector
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: datacollector
+      DB_USER: datacollector
+      DB_PASSWORD: ${DATACOLLECTOR_DB_PASSWORD}
+      APP_ADMIN_USER: ${DATACOLLECTOR_ADMIN_USER}
+      APP_ADMIN_PASSWORD: ${DATACOLLECTOR_ADMIN_PASSWORD}
+
+    depends_on:
+      - postgres
+
+    networks:
+      - internal
+      - cloudflare
+
   postgres:
     image: postgres:17
+    container_name: datacollector-postgres
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: datacollector
-      POSTGRES_PASSWORD: datacollector
       POSTGRES_DB: datacollector
-    ports:
-      - 5433:5432
+      POSTGRES_USER: datacollector
+      POSTGRES_PASSWORD: ${DATACOLLECTOR_DB_PASSWORD}
+
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - datacollector-postgres:/var/lib/postgresql/data
+
+    networks:
+      - internal
 
 volumes:
-  postgres_data:
+  datacollector-postgres:
+
+networks:
+  internal:
+  cloudflare:
+    external: true
