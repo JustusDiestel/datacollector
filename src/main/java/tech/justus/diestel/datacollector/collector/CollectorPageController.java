@@ -79,7 +79,7 @@ public class CollectorPageController {
                     sourcePath.get(i),
                     targetName.get(i),
                     dataType.get(i),
-                    unit.get(i)
+                    i < unit.size() ? unit.get(i) : null
             );
 
             fields.add(field);

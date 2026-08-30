@@ -53,11 +53,13 @@ public class CollectorService {
     }
 
     public List<Collector> getAllCollectors() {
-        return collectorRepository.findAll();
+        return collectorRepository.findAllWithFieldMappings();
     }
 
-    public Collector getCollectorById(Long id){
-        return collectorRepository.findById(id).orElseThrow(() -> new RuntimeException("Collector not found"));
+
+    public Collector getCollectorById(Long id) {
+        return collectorRepository.findByIdWithFieldMappings(id)
+                .orElseThrow(() -> new RuntimeException("Collector not found"));
     }
 
 
