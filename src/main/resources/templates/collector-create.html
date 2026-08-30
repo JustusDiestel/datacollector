@@ -49,7 +49,7 @@
         <h1>Create Collector</h1>
         <p class="muted">Lege eine HTTP-JSON-Datenquelle und die Felder fest, die gespeichert werden sollen.</p>
 
-        <form action="/collector-dashboard/new" method="post">
+        <form th:action="@{/collector-dashboard/new}" method="post">
             <div class="form-grid">
                 <div>
                     <label for="name">Name</label>
