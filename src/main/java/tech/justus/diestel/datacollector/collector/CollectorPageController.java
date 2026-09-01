@@ -65,6 +65,8 @@ public class CollectorPageController {
             @RequestParam String url,
             @RequestParam int intervalSeconds,
             @RequestParam(required = false, defaultValue = "") String recordsPath,
+            @RequestParam(defaultValue = "GET") String requestMethod,
+            @RequestParam(required = false) String requestBody,
             @RequestParam List<String> sourcePath,
             @RequestParam List<String> targetName,
             @RequestParam List<String> dataType,
@@ -90,6 +92,8 @@ public class CollectorPageController {
                 url,
                 intervalSeconds,
                 recordsPath,
+                requestMethod,
+                requestBody,
                 fields
         );
 

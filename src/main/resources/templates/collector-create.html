@@ -19,7 +19,7 @@
         .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
         .full { grid-column: 1 / -1; }
         label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
-        input, select { width: 100%; padding: 10px 11px; border: 1px solid #d1d5db; border-radius: 8px; font: inherit; background: white; }
+        input, select, textarea { width: 100%; padding: 10px 11px; border: 1px solid #d1d5db; border-radius: 8px; font: inherit; background: white; }
         .fields-header { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; }
         .field { display: grid; grid-template-columns: 1.2fr 1.2fr .8fr .8fr auto; gap: 10px; margin-top: 10px; align-items: end; }
         button, .button { font: inherit; border: 1px solid #d1d5db; background: white; padding: 10px 14px; border-radius: 8px; cursor: pointer; }
@@ -66,12 +66,24 @@
                     <input id="url" type="url" name="url" required placeholder="https://api.example.com/data">
                 </div>
 
-                <div class="full">
+                <div>
+                    <label for="requestMethod">HTTP Method</label>
+                    <select id="requestMethod" name="requestMethod" onchange="toggleRequestBody()">
+                        <option value="GET" selected>GET</option>
+                        <option value="POST">POST</option>
+                    </select>
+                </div>
+
+                <div>
                     <label for="recordsPath">Records Path (optional)</label>
-                    <input id="recordsPath"
-                           type="text"
-                           name="recordsPath"
-                           placeholder="Leer lassen für Root-JSON">
+                    <input id="recordsPath" type="text" name="recordsPath"
+                           placeholder="Leer = Root JSON, z. B. current oder data.items">
+                </div>
+
+                <div id="requestBodyContainer" class="full" style="display: none;">
+                    <label for="requestBody">JSON Request Body (POST)</label>
+                    <textarea id="requestBody" name="requestBody" rows="8"
+                              placeholder='{"query":"{ water { observations { ... } } }"}'></textarea>
                 </div>
             </div>
 
@@ -119,6 +131,12 @@
 </div>
 
 <script>
+    function toggleRequestBody() {
+        const method = document.getElementById("requestMethod").value;
+        const bodyContainer = document.getElementById("requestBodyContainer");
+        bodyContainer.style.display = method === "POST" ? "block" : "none";
+    }
+
     function addField() {
         const fields = document.getElementById("fields");
         const field = document.createElement("div");

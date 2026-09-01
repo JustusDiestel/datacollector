@@ -27,6 +27,11 @@ public class Collector {
 
     private String recordsPath;
 
+    private String requestMethod = "GET";
+
+    @Column(length = 10000)
+    private String requestBody;
+
     private Instant createdAt;
 
     private Instant lastRunAt;
@@ -53,10 +58,27 @@ public class Collector {
             int intervalSeconds,
             String recordsPath
     ) {
+        this(name, url, intervalSeconds, recordsPath, "GET", null);
+    }
+
+    public Collector(
+            String name,
+            String url,
+            int intervalSeconds,
+            String recordsPath,
+            String requestMethod,
+            String requestBody
+    ) {
         this.name = name;
         this.url = url;
         this.intervalSeconds = intervalSeconds;
         this.recordsPath = recordsPath == null ? "" : recordsPath.trim();
+        this.requestMethod = requestMethod == null || requestMethod.isBlank()
+                ? "GET"
+                : requestMethod.trim().toUpperCase();
+        this.requestBody = requestBody == null || requestBody.isBlank()
+                ? null
+                : requestBody.trim();
         this.createdAt = Instant.now();
     }
 
@@ -78,6 +100,14 @@ public class Collector {
 
     public String getRecordsPath() {
         return recordsPath;
+    }
+
+    public String getRequestMethod() {
+        return requestMethod;
+    }
+
+    public String getRequestBody() {
+        return requestBody;
     }
 
     public Instant getCreatedAt() {

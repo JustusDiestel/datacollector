@@ -31,7 +31,9 @@ public class CollectorService {
                 request.name(),
                 request.url(),
                 request.intervalSeconds(),
-                request.recordsPath()
+                request.recordsPath(),
+                request.requestMethod(),
+                request.requestBody()
         );
 
         if (request.fields() != null) {

@@ -2,6 +2,7 @@ package tech.justus.diestel.datacollector.collector;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -23,11 +24,34 @@ public class HttpJsonCollector {
 
     public JsonNode fetch(Collector collector) throws Exception {
 
-        String response = restClient
-                .get()
-                .uri(collector.getUrl())
-                .retrieve()
-                .body(String.class);
+        String response;
+        String method = collector.getRequestMethod() == null
+                ? "GET"
+                : collector.getRequestMethod().toUpperCase();
+
+        if ("GET".equals(method)) {
+            response = restClient
+                    .get()
+                    .uri(collector.getUrl())
+                    .retrieve()
+                    .body(String.class);
+        } else if ("POST".equals(method)) {
+            String body = collector.getRequestBody() == null
+                    ? "{}"
+                    : collector.getRequestBody();
+
+            response = restClient
+                    .post()
+                    .uri(collector.getUrl())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(body)
+                    .retrieve()
+                    .body(String.class);
+        } else {
+            throw new IllegalArgumentException(
+                    "Unsupported HTTP method: " + method
+            );
+        }
 
         JsonNode root = jsonMapper.readTree(response);
 
@@ -65,15 +89,77 @@ public class HttpJsonCollector {
 
             JsonNode value = findPath(record, mapping.getSourcePath());
 
-            Object convertedValue = switch (mapping.getDataType()) {
-                case "DOUBLE" -> value.asDouble();
-                case "INTEGER" -> value.asInt();
-                case "BOOLEAN" -> value.asBoolean();
-                case "STRING" -> value.asText();
-                default -> value.asText();
-            };
+            result.put(
+                    mapping.getTargetName(),
+                    convertValue(value, mapping.getDataType())
+            );
+        }
 
-            result.put(mapping.getTargetName(), convertedValue);
+        return result;
+    }
+
+    private Object convertValue(JsonNode value, String dataType) {
+        return switch (dataType) {
+            case "DOUBLE" -> value.asDouble();
+            case "INTEGER" -> value.asInt();
+            case "BOOLEAN" -> value.asBoolean();
+            case "STRING" -> value.asText();
+            default -> value.asText();
+        };
+    }
+
+    private boolean containsMappedArrays(
+            JsonNode record,
+            Collector collector
+    ) {
+        for (FieldMapping mapping : collector.getFieldMappings()) {
+            if (findPath(record, mapping.getSourcePath()).isArray()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private List<Map<String, Object>> mapParallelArrays(
+            JsonNode record,
+            Collector collector
+    ) {
+        int arrayLength = -1;
+
+        for (FieldMapping mapping : collector.getFieldMappings()) {
+            JsonNode value = findPath(record, mapping.getSourcePath());
+
+            if (value.isArray()) {
+                if (arrayLength == -1) {
+                    arrayLength = value.size();
+                } else if (value.size() != arrayLength) {
+                    throw new IllegalArgumentException(
+                            "Mapped JSON arrays have different lengths"
+                    );
+                }
+            }
+        }
+
+        if (arrayLength < 0) {
+            return List.of(mapRecord(record, collector));
+        }
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (int i = 0; i < arrayLength; i++) {
+            Map<String, Object> mappedRecord = new HashMap<>();
+
+            for (FieldMapping mapping : collector.getFieldMappings()) {
+                JsonNode value = findPath(record, mapping.getSourcePath());
+                JsonNode item = value.isArray() ? value.get(i) : value;
+
+                mappedRecord.put(
+                        mapping.getTargetName(),
+                        convertValue(item, mapping.getDataType())
+                );
+            }
+
+            result.add(mappedRecord);
         }
 
         return result;
@@ -93,7 +179,11 @@ public class HttpJsonCollector {
 
         } else if (records.isObject()) {
 
-            result.add(mapRecord(records, collector));
+            if (containsMappedArrays(records, collector)) {
+                result.addAll(mapParallelArrays(records, collector));
+            } else {
+                result.add(mapRecord(records, collector));
+            }
 
         } else {
 
