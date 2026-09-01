@@ -64,7 +64,7 @@ public class CollectorPageController {
             @RequestParam String name,
             @RequestParam String url,
             @RequestParam int intervalSeconds,
-            @RequestParam String recordsPath,
+            @RequestParam(required = false, defaultValue = "") String recordsPath,
             @RequestParam List<String> sourcePath,
             @RequestParam List<String> targetName,
             @RequestParam List<String> dataType,

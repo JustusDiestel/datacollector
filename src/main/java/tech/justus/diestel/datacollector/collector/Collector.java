@@ -56,7 +56,7 @@ public class Collector {
         this.name = name;
         this.url = url;
         this.intervalSeconds = intervalSeconds;
-        this.recordsPath = recordsPath;
+        this.recordsPath = recordsPath == null ? "" : recordsPath.trim();
         this.createdAt = Instant.now();
     }
 

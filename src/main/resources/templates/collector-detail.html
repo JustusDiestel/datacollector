@@ -87,7 +87,9 @@
         </div>
         <div class="card">
             <span class="meta-label">Records path</span>
-            <strong th:text="${collector.recordsPath}">current</strong>
+            <strong th:text="${#strings.isEmpty(collector.recordsPath) ? 'Root JSON' : collector.recordsPath}">
+                Root JSON
+            </strong>
         </div>
         <div class="card">
             <span class="meta-label">Created</span>

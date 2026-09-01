@@ -1,4 +1,5 @@
 package tech.justus.diestel.datacollector.collector;
+
 import java.util.List;
 
 public record CreateCollectorRequest(
@@ -8,4 +9,8 @@ public record CreateCollectorRequest(
         String recordsPath,
         List<FieldMappingRequest> fields
 ) {
+
+    public CreateCollectorRequest {
+        recordsPath = recordsPath == null ? "" : recordsPath.trim();
+    }
 }

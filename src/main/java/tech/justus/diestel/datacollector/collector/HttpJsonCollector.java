@@ -36,6 +36,10 @@ public class HttpJsonCollector {
 
     private JsonNode findPath(JsonNode root, String path) {
 
+        if (path == null || path.isBlank()) {
+            return root;
+        }
+
         JsonNode current = root;
 
         for (String part : path.split("\\.")) {
